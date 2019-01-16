@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  simulator:
+    build: .
+    tty: true
+    hostname: interscity.local
+    environment:
+      - RABBITMQ_HOST=rabbitmq-interscsimulator
+    volumes:
+      - '.:/sim-diasca'
+      - './mock-simulators/interscsimulator-blue/assets/simulation_input:/simulation_input'
+      - './mock-simulators/interscsimulator-blue/assets/simulation_output:/simulation_output'
+      - './mock-simulators/interscsimulator-blue/deps:/deps'
+    command: bash -c "make all && cd mock-simulators/interscsimulator-blue/src && make all && make smart_city_run CMD_LINE_OPT='--batch'"
+
+networks:
+  default:
+    external:
+      name: platform
