@@ -1,0 +1,85 @@
+# Warning: using immediate writes here, thus this header might be
+# inaccurate, should subsequent curve reordering or addition be performed.
+# Only initially created curves are listed below, the dynamically added ones
+# are not visible in this file.
+
+# This time series data file has been written on 9/11/2018, at 17:34:54, on
+# host interscity.local (node: Sim-Diasca-Soda_Deterministic_Integration_Test-root-80033280-user-node@interscity.local).
+
+# Probe name: 'Resource Consumption Probe Over Wallclock Time for user node Sim-Diasca-Soda_Deterministic_Integration_Test-root-80033280-user-node@interscity.local'.
+# Probe title: 'Monitoring memory and swap consumptions on user node Sim-Diasca-Soda_Deterministic_Integration_Test-root-80033280-user-node@interscity.local  over wall-clock time'.
+
+# Associated meta-data:
+
+
+# First column corresponds to the abscissa, expressed in tick offsets.
+# Next columns correspond to following curve names (in that order):
+# - curve #1: 'Total Memory Used (over a total of 15.6 GiB)'
+# - curve #2: 'Memory Used by the Erlang VM (version R20B)'
+# - curve #3: 'Swap Used (in GiB, over a total of 9.0 GiB)'
+# - curve #4: 'Percentage of CPU Used (Non-idle)'
+# - curve #5: 'Erlang Process Count (spread over 4 cores)'
+
+# Following zones were defined:
+# - zone 'Total available memory (free+buffers+cache)', extending from abscissa_top to 1
+# - zone 'Memory used by all other programs', extending from 1 to 2
+# - zone 'Memory used for the simulation (over a total of 15.6 GiB)', extending from abscissa_bottom to 2
+
+
+6474  61.0 0.3 0 98.49999999999999 62
+6576  61.0 0.3 0 98.7 62
+6785  61.0 0.3 0 97.99999999999999 62
+6972  61.0 0.3 0 100.0 62
+7252  61.0 0.3 0 96.39999999999999 62
+7475  61.0 0.3 0 96.3 62
+7673  61.0 0.3 0 96.9 62
+7809  61.0 0.3 0 97.1 62
+7894  61.0 0.3 0 100.0 62
+7946  61.0 0.3 0 100.00000000000001 62
+8117  61.0 0.3 0 98.89999999999999 62
+8268  60.9 0.3 0 97.39999999999999 62
+8447  60.9 0.3 0 100.0 62
+8619  60.9 0.3 0 96.5 62
+8835  60.9 0.3 0 99.0 62
+9033  60.9 0.3 0 98.6 62
+9213  60.9 0.3 0 97.10000000000001 62
+9393  60.9 0.3 0 99.99999999999999 62
+9538  60.9 0.3 0 98.10000000000001 62
+9744  60.9 0.3 0 99.99999999999999 62
+9908  60.9 0.3 0 100.0 62
+10105  60.9 0.3 0 97.19999999999999 62
+10221  60.9 0.3 0 98.3 62
+10470  60.8 0.3 0 97.4 62
+10677  60.9 0.3 0 98.7 62
+10759  60.9 0.3 0 97.89999999999999 62
+10894  60.9 0.3 0 96.4 62
+11023  60.9 0.3 0 100.0 62
+11147  60.9 0.3 0 100.0 62
+11282  60.9 0.3 0 97.2 62
+11472  60.9 0.3 0 99.99999999999999 62
+11673  60.9 0.3 0 97.79999999999998 62
+11863  60.9 0.3 0 97.3 62
+12065  60.9 0.3 0 98.5 62
+12295  60.9 0.3 0 99.1 62
+12514  60.9 0.3 0 98.0 62
+12757  60.9 0.3 0 99.0 62
+12919  60.9 0.3 0 98.30000000000001 62
+13090  60.9 0.3 0 98.1 62
+13247  60.8 0.3 0 96.2 62
+13419  60.9 0.3 0 100.0 62
+13625  60.8 0.3 0 100.00000000000001 62
+13808  60.8 0.3 0 96.7 62
+13999  60.8 0.3 0 98.9 62
+14166  60.8 0.3 0 98.70000000000002 62
+14369  60.9 0.3 0 100.0 62
+14519  60.8 0.3 0 100.0 62
+14718  60.8 0.3 0 98.10000000000001 62
+14923  60.8 0.3 0 100.0 62
+15154  60.8 0.3 0 100.0 62
+15327  60.8 0.3 0 100.0 62
+15478  60.8 0.3 0 98.6 62
+15729  60.8 0.3 0 100.0 62
+15930  60.8 0.3 0 96.7 62
+16118  60.8 0.3 0 99.99999999999999 62
+16252  60.8 0.3 0 100.0 62
+16508  60.8 0.3 0 97.39999999999999 62

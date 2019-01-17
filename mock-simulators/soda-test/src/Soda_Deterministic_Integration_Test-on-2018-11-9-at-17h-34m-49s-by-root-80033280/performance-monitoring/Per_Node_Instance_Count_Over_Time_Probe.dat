@@ -1,0 +1,77 @@
+# Warning: using immediate writes here, thus this header might be
+# inaccurate, should subsequent curve reordering or addition be performed.
+# Only initially created curves are listed below, the dynamically added ones
+# are not visible in this file.
+
+# This time series data file has been written on 9/11/2018, at 17:34:54, on
+# host interscity.local (node: Sim-Diasca-Soda_Deterministic_Integration_Test-root-80033280-user-node@interscity.local).
+
+# Probe name: 'Per Node Instance Count Over Time Probe'.
+# Probe title: 'Monitoring the Overall and Per-Node Instance Count Over Wall-clock Time'.
+
+# Associated meta-data:
+
+
+# First column corresponds to the abscissa, expressed in tick offsets.
+# Next columns correspond to following curve names (in that order):
+# - curve #1: 'Overall Instance Count'
+
+# No zone defined.
+
+6474  2 2
+6576  5 5
+6785  5 5
+6972  5 5
+7252  5 5
+7475  5 5
+7673  5 5
+7809  5 5
+7894  5 5
+7946  5 5
+8117  5 5
+8268  5 5
+8447  5 5
+8619  5 5
+8835  5 5
+9033  5 5
+9213  5 5
+9393  5 5
+9538  5 5
+9744  5 5
+9908  5 5
+10105  5 5
+10221  5 5
+10470  5 5
+10677  5 5
+10759  5 5
+10894  5 5
+11023  5 5
+11147  5 5
+11282  5 5
+11472  5 5
+11673  5 5
+11863  5 5
+12065  5 5
+12295  5 5
+12514  5 5
+12757  5 5
+12919  5 5
+13090  5 5
+13247  5 5
+13419  5 5
+13625  5 5
+13808  5 5
+13999  5 5
+14166  5 5
+14369  5 5
+14519  5 5
+14718  5 5
+14923  5 5
+15154  5 5
+15327  5 5
+15478  5 5
+15729  5 5
+15930  5 5
+16118  5 5
+16252  5 5
+16508  5 5

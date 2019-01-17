@@ -1,0 +1,77 @@
+# Warning: using immediate writes here, thus this header might be
+# inaccurate, should subsequent curve reordering or addition be performed.
+# Only initially created curves are listed below, the dynamically added ones
+# are not visible in this file.
+
+# This time series data file has been written on 9/11/2018, at 17:34:54, on
+# host interscity.local (node: Sim-Diasca-Soda_Deterministic_Integration_Test-root-80033280-user-node@interscity.local).
+
+# Probe name: 'Per Class Instance Count Over Tick Probe'.
+# Probe title: 'Monitoring the Overall and Per-Class Instance Count Over Simulation Ticks'.
+
+# Associated meta-data:
+
+
+# First column corresponds to the abscissa, expressed in tick offsets.
+# Next columns correspond to following curve names (in that order):
+# - curve #1: 'Overall Instance Count'
+
+# No zone defined.
+
+0  2 2
+52  5 2 3
+380  5 2 3
+1010  5 2 3
+1499  5 2 3
+2076  5 2 3
+2643  5 2 3
+3042  5 2 3
+3644  5 2 3
+4052  5 2 3
+4622  5 2 3
+5059  5 2 3
+5616  5 2 3
+5943  5 2 3
+6341  5 2 3
+6706  5 2 3
+7172  5 2 3
+7729  5 2 3
+8266  5 2 3
+8836  5 2 3
+9490  5 2 3
+10010  5 2 3
+10586  5 2 3
+11033  5 2 3
+11689  5 2 3
+12258  5 2 3
+12813  5 2 3
+13000  5 2 3
+13636  5 2 3
+14199  5 2 3
+14684  5 2 3
+15074  5 2 3
+15580  5 2 3
+16007  5 2 3
+16520  5 2 3
+17000  5 2 3
+17510  5 2 3
+18000  5 2 3
+18509  5 2 3
+19070  5 2 3
+19577  5 2 3
+20173  5 2 3
+20486  5 2 3
+20915  5 2 3
+21304  5 2 3
+21721  5 2 3
+22130  5 2 3
+22567  5 2 3
+22928  5 2 3
+23472  5 2 3
+24000  5 2 3
+24530  5 2 3
+24905  5 2 3
+25437  5 2 3
+25813  5 2 3
+26387  5 2 3
+26913  5 2 3
