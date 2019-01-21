@@ -1,4 +1,4 @@
-% Copyright (C) 2008-2018 EDF R&D
+% Copyright (C) 2008-2019 EDF R&D
 
 % This file is part of Sim-Diasca.
 
@@ -133,10 +133,6 @@
 % Useful for testing directly from the shell:
 -export([ test_spontaneous_lists/0, test_min_max_timestamps/0 ]).
 
-
-% For backward compatibility:
--type void() :: basic_utils:void().
--type maybe(T) :: basic_utils:maybe(T).
 
 
 % Design notes.
@@ -750,8 +746,8 @@
 %
 % - waited_count :: basic_utils::count() counts the number of 'done'
 % notifications, coming from scheduled actors, child managers and the watchdog,
-% that are waited this diasca (it spares the need of polling numerous sets each
-% time a new 'done' message is received)
+% that are waited this diasca (this cached count spares the need of polling
+% numerous sets each time a new 'done' message is received)
 %
 % - interactive_tick_triggered :: boolean() allows, in interactive mode, to
 % schedule a new tick only once, even if the timer sent multiple
@@ -870,11 +866,11 @@ construct( State, SimulationTickDuration, InteractivityMode,
 	% The child_managers are declared here, as the declareChildManager call will
 	% need them to be already set:
 	%
-	CategorizedState = setAttribute( TraceState, child_managers,
-									 set_utils:new() ),
+	CategorizedState =
+		setAttribute( TraceState, child_managers, set_utils:new() ),
 
-	ActualSimulationTickDuration = check_tick_duration(
-									 SimulationTickDuration ),
+	ActualSimulationTickDuration =
+		check_tick_duration( SimulationTickDuration ),
 
 	case InteractivityMode of
 
@@ -891,7 +887,8 @@ construct( State, SimulationTickDuration, InteractivityMode,
 
 	RegistrationName = get_registration_name(),
 
-	{ ParentManager, Description } = case ParentManagerInformation of
+	{ ParentManager, Description, InitialWaitedCount } =
+		case ParentManagerInformation of
 
 		none ->
 
@@ -904,16 +901,20 @@ construct( State, SimulationTickDuration, InteractivityMode,
 							 "registered as '~s', locally and globally.",
 							 [ RegistrationName ] ),
 
-			% The root manager is directly spawned as linked to the deployment
-			% manager.
+			% The root manager is directly spawned as a process linked to the
+			% deployment manager.
 
-			{ undefined, "root time manager" };
+			% We wait until the actual start to set the initial waited count (as
+			% the root time manager may be restarted, so each start should be
+			% done with a right initialisation):
+			%
+			{ undefined, "root time manager", _InitialWaitedCount=undefined };
 
 
 		ParentPid when is_pid( ParentPid ) ->
 
 			% We are here a local (non-root) time manager, the children have to
-			% declare to their direct parent:
+			% declare themselves to their direct parent:
 			%
 			% (request for synchronisation purposes)
 			%
@@ -938,7 +939,11 @@ construct( State, SimulationTickDuration, InteractivityMode,
 					Desc = io_lib:format( "child time manager, "
 										  "whose parent manager is ~w,",
 										  [ ParentPid ] ),
-					{ ParentPid, Desc }
+					% A child manager is not specifically started, hence it will
+					% not go through init/0, so we initialise its waited count
+					% here:
+					%
+					{ ParentPid, Desc, _InitialWaitedCount=0 }
 
 			end
 
@@ -1003,8 +1008,8 @@ construct( State, SimulationTickDuration, InteractivityMode,
 	%							 code_utils:get_code_path() ) ] ),
 
 	% Instance trackers are created before time managers:
-	LocalInstanceTrackerPid = naming_utils:get_registered_pid_for(
-											?instance_tracker_name, local ),
+	LocalInstanceTrackerPid =
+		naming_utils:get_registered_pid_for( ?instance_tracker_name, local ),
 
 	EmptySet = set_utils:new(),
 
@@ -1067,7 +1072,7 @@ construct( State, SimulationTickDuration, InteractivityMode,
 		{ waited_spontaneous_actors, undefined },
 		{ waited_triggered_actors, undefined },
 		{ watchdog_waited, false },
-		{ waited_count, undefined },
+		{ waited_count, InitialWaitedCount },
 		{ interactive_tick_triggered, undefined },
 		{ timer_pid, undefined },
 		{ wallclock_tracker_pid, undefined },
@@ -1092,8 +1097,8 @@ construct( State, SimulationTickDuration, InteractivityMode,
 	%
 	% (StartState needed, as depends on simulation_tick_duration)
 	%
-	DefaultInitialTick = timestamp_to_ticks( ?initial_simulation_date,
-											 StartState ),
+	DefaultInitialTick =
+		timestamp_to_ticks( ?initial_simulation_date, StartState ),
 
 	?send_debug_fmt( StartState,
 					 "Time manager created, default initial tick is ~B.",
@@ -1415,8 +1420,8 @@ setFinalSimulationTimestamp( State, FinalDate, FinalTime ) ->
 
 % (helper)
 %
--spec set_final_simulation_timestamp( time_utils:timestamp(), wooper:state() ) ->
-								 wooper:state().
+-spec set_final_simulation_timestamp( time_utils:timestamp(),
+									  wooper:state() ) -> wooper:state().
 set_final_simulation_timestamp( FinalTimestamp, State ) ->
 
 	false = ?getAttr(started),
@@ -1430,7 +1435,6 @@ set_final_simulation_timestamp( FinalTimestamp, State ) ->
 	case DurationInTicks > 0 of
 
 		true ->
-
 			?info_fmt( "New final simulation tick is #~B, deriving "
 					   "from specified final timestamp at ~s.",
 					   [ FinalTick,
@@ -1496,8 +1500,8 @@ start( State ) ->
 start( State, TerminationOffset ) when is_integer( TerminationOffset ) ->
 
 	% This is an offset, no checking needed here:
-	InitState = init(
-				  setAttribute( State, stop_tick_offset, TerminationOffset ) ),
+	InitState =
+		init( setAttribute( State, stop_tick_offset, TerminationOffset ) ),
 
 	StopTick = getAttribute( InitState, initial_tick ) + TerminationOffset,
 
@@ -1513,8 +1517,8 @@ start( State, TerminationOffset ) when is_integer( TerminationOffset ) ->
 % (second clause of the oneway)
 %
 start( State, SimulationListenerPID ) when is_pid( SimulationListenerPID ) ->
-	start( appendToAttribute( State, simulation_listeners,
-							  SimulationListenerPID ) ).
+	start(
+	  appendToAttribute( State, simulation_listeners, SimulationListenerPID ) ).
 
 
 
@@ -1897,7 +1901,7 @@ mergeWith( State, Entries ) ->
 		{ initial_timestamp, option_list:get( initial_timestamp, Entries ) },
 		{ initial_tick, option_list:get( initial_tick, Entries ) },
 		{ current_tick_offset,
-		  option_list:get( current_tick_offset, Entries ) },
+			option_list:get( current_tick_offset, Entries ) },
 		{ current_diasca, option_list:get( current_diasca, Entries ) },
 		{ actors_to_delete_at_next_tick, MergedToDelete }
 
@@ -3672,7 +3676,7 @@ onSimulationStallDetected( State ) ->
 			io_lib:format(
 				"still waiting for following ~B child time manager(s): ~s",
 				[ ChildManagerCount,
-				  text_utils:join( _Sep=", ",  ManagerDescriptions ) ] )
+				  text_utils:join( _Sep=", ", ManagerDescriptions ) ] )
 
 	end,
 
@@ -3900,7 +3904,7 @@ is_root_manager( State ) ->
 %
 % (helper)
 %
--spec display_timing_information( string(), wooper:state() ) -> void().
+-spec display_timing_information( string(), wooper:state() ) -> integer().
 display_timing_information( Timings, State ) ->
 
 	ElapsedTicks = get_current_tick( State ) - ?getAttr(initial_tick),
@@ -3952,7 +3956,7 @@ display_timing_information( Timings, State ) ->
 %
 % (helper)
 %
--spec display_concurrency_information( wooper:state() ) -> void().
+-spec display_concurrency_information( wooper:state() ) -> integer().
 display_concurrency_information( State ) ->
 
 	case ?getAttr(diasca_count) of
@@ -4848,7 +4852,7 @@ stop_watchdog( State ) ->
 % Period is in wall-clock milliseconds.
 %
 -spec wallclock_tracker_main_loop( pid(), unit_utils:milliseconds(),
-								   unit_utils:milliseconds() ) -> void().
+								   unit_utils:milliseconds() ) -> integer().
 wallclock_tracker_main_loop( RootTimemanagerPid, Period, TotalDuration ) ->
 
 	receive
@@ -4875,30 +4879,12 @@ wallclock_tracker_main_loop( RootTimemanagerPid, Period, TotalDuration ) ->
 % This prevents very fast simulations from being slowed down by the mere console
 % output of tick progress (flow control).
 %
-% Parameters are:
-%
-
-% - LatestDisplayedSecond corresponds to the latest second during which an
-% output was performed (on the console)
-%
-
-% - LatestMeasuredSecond corresponds to the latest measured second, as reported
-% by the root time manager
-%
-
-% - LatestTopInfo is {Timings,Counts}, as specified by the root time manager,
-% i.e. Timings={ SimDateString, SimTimeString, CurrentTickOffset, CurrentDiasca,
-% RealDateString, RealTimeString } and Counts={ TotalActorCount,
-% TotalScheduleCount, TotalProcessCount }
-%
 % Note: the tick tracker output (i.e. mainly the tick table) can be displayed so
 % that it respects the RST syntax (see 'Uncomment for RST output').
 %
 % Therefore a PDF file can be generated from it, for example thanks to the
 % generate-pdf-from-rst.sh script.
 %
-
-
 -spec time_tracker_start( pid(), pid() ) -> no_return().
 time_tracker_start( LoadBalancerPid, RootTimeManagerPid ) ->
 
@@ -4918,7 +4904,7 @@ time_tracker_start( LoadBalancerPid, RootTimeManagerPid ) ->
 % Note: PreviousSimTimestamp is useful to report the current timestamp at which
 % any diasca may durably remain.
 %
--spec time_tracker_main_loop( maybe( time_utils:time() ), logical_timestamp(),
+-spec time_tracker_main_loop( basic_utils:maybe( time_utils:time() ), logical_timestamp(),
 				  pid(), pid(), unit_utils:milliseconds() ) -> no_return().
 time_tracker_main_loop( PreviousDisplayTime, PreviousSimTimestamp,
 						LoadBalancerPid, RootTimeManagerPid, WaitTime ) ->
@@ -4978,7 +4964,8 @@ time_tracker_main_loop( PreviousDisplayTime, PreviousSimTimestamp,
 					true;
 
 				_ ->
-					get_intertime_duration( PreviousDisplayTime, RecordTime ) > 0
+					time_utils:get_intertime_duration( PreviousDisplayTime,
+													   RecordTime ) > 0
 
 			end,
 
@@ -4994,16 +4981,18 @@ time_tracker_main_loop( PreviousDisplayTime, PreviousSimTimestamp,
 
 				false ->
 					{ _SimDateString, _SimTimeString, CurrentTickOffset,
-					  CurrentDiasca, _RealDateString, _RealTimeString } = Timings,
+					  CurrentDiasca, _RealDateString, _RealTimeString } =
+															  Timings,
 
-					NonDisplayedTimestamp = { CurrentTickOffset, CurrentDiasca },
+					NonDisplayedTimestamp = { CurrentTickOffset,
+											  CurrentDiasca },
 
 					{ PreviousDisplayTime, NonDisplayedTimestamp }
 
 			end,
 
 			time_tracker_main_loop( NewDisplayTime, NewSimTimestamp,
-							LoadBalancerPid, RootTimeManagerPid, 
+							LoadBalancerPid, RootTimeManagerPid,
 							_WaitTime=?nominal_wait_time );
 
 
@@ -5031,21 +5020,6 @@ time_tracker_main_loop( PreviousDisplayTime, PreviousSimTimestamp,
 
 	end.
 
-
-
-
-% To be put in time_utils:
-
-% Returns the signed duration, in integer seconds, between the two specified
-% times.
-%
-% A positive duration will be returned iff the first specified time is before
-% the second one.
-%
--spec get_intertime_duration( time_utils:time(), time_utils:time() ) ->
-									unit_utils:seconds().
-get_intertime_duration( { H1, M1, S1 }, { H2, M2, S2 } ) ->
-	( ( H2 - H1 ) * 60 + ( M2 - M1 ) ) * 60 + ( S2 - S1 ).
 
 
 
@@ -5228,7 +5202,7 @@ stop_time_tracker( State ) ->
 %
 % Note: the time manager must be started.
 %
--spec get_current_tick_offset( wooper:state() ) -> maybe( tick_offset() ).
+-spec get_current_tick_offset( wooper:state() ) -> basic_utils:maybe( tick_offset() ).
 get_current_tick_offset( State ) ->
 	?getAttr(current_tick_offset).
 
@@ -5544,8 +5518,8 @@ init( State ) ->
 	% We must record current_tick_offset=InitialTick-1 for the engine, but we
 	% want the start outputs to show InitialTick instead:
 	%
-	Timings = get_textual_timings( addToAttribute( PostStartedState,
-												   current_tick_offset, 1 ) ),
+	Timings = get_textual_timings(
+				addToAttribute( PostStartedState, current_tick_offset, 1 ) ),
 
 	?info_fmt( "Simulation started at ~s with a simulation frequency "
 			   "of approximately ~fHz (period of exactly ~s). ~s",
@@ -6567,7 +6541,7 @@ check_waited_count_consistency( State ) ->
 
 % Outputs in console the current status regarding waiting of this time manager.
 %
--spec display_waiting_reason( wooper:state() ) -> void().
+-spec display_waiting_reason( wooper:state() ) -> integer().
 display_waiting_reason( State ) ->
 
 	WaitedSpontaneous = set_utils:size( ?getAttr(waited_spontaneous_actors) ),
@@ -7073,7 +7047,7 @@ manage_new_diasca( TickOffset, NewDiasca, State ) ->
 % (helper)
 %
 -spec record_progress_message( class_TimeManager:tick_offset(),
-				   class_TimeManager:diasca(), wooper:state() ) -> void().
+				   class_TimeManager:diasca(), wooper:state() ) -> integer().
 record_progress_message( TickOffset, Diasca, State ) ->
 
 	case ?getAttr(time_tracker_pid) of
@@ -7913,7 +7887,7 @@ post_deserialise_hook( State ) ->
 % Merges specified entries coming from deserialisation into the local time
 % manager.
 %
--spec merge_local_with( wooper_serialisation:term_serialisation() ) -> void().
+-spec merge_local_with( wooper_serialisation:term_serialisation() ) -> integer().
 merge_local_with( SerialisedEntries ) ->
 
 	RegistrationName = get_registration_name(),
@@ -7936,7 +7910,7 @@ merge_local_with( SerialisedEntries ) ->
 %
 % Using atoms instead of PID.
 %
--spec test_spontaneous_lists() -> void().
+-spec test_spontaneous_lists() -> integer().
 test_spontaneous_lists() ->
 
 	% Starts with an empty list:
@@ -7969,7 +7943,7 @@ test_spontaneous_lists() ->
 
 % Helper function to test the minimum and maximum comparisons over timestamps.
 %
--spec test_min_max_timestamps() -> void().
+-spec test_min_max_timestamps() -> integer().
 test_min_max_timestamps() ->
 
 	Z = { 0, 0 },
