@@ -7,6 +7,9 @@ services:
     hostname: interscity.local
     environment:
       - RABBITMQ_HOST=rabbitmq-interscsimulator
+      - KAFKA_BUILD_PATH=/deps/brod/_build
+      - KAFKA_HOST=interscity-kafka
+      - KAFKA_PORT=9092
     volumes:
       - '.:/sim-diasca'
       - './mock-simulators/interscsimulator-blue/assets/simulation_input:/simulation_input'
