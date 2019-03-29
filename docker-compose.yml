@@ -6,16 +6,17 @@ services:
     tty: true
     hostname: interscity.local
     environment:
-      - RABBITMQ_HOST=rabbitmq-interscsimulator
+      - RABBITMQ_HOST=rabbitmq
+      - AMQP_CLIENT_PATH=/deps/amqp_client
       - KAFKA_BUILD_PATH=/deps/brod/_build
-      - KAFKA_HOST=interscity-kafka
+      - KAFKA_HOST=kafka
       - KAFKA_PORT=9092
     volumes:
       - '.:/sim-diasca'
       - './mock-simulators/interscsimulator-blue/assets/simulation_input:/simulation_input'
       - './mock-simulators/interscsimulator-blue/assets/simulation_output:/simulation_output'
       - './mock-simulators/interscsimulator-blue/deps:/deps'
-    command: bash -c "make all && cd mock-simulators/interscsimulator-blue/src && make all && make smart_city_run CMD_LINE_OPT='--batch'"
+    command: bash -c "make all && cd mock-simulators/interscsimulator-blue/src && make all && make docker_smart_city_run CMD_LINE_OPT='--batch'"
 
 networks:
   default:
